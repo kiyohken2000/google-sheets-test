@@ -1,11 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import axios from 'axios';
+import { dataUrl } from './src/config';
+import { formatData } from './src/functions';
 
 export default function App() {
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    const fetchData = async() => {
+      try {
+        const res = await axios.get(dataUrl)
+        const { data } = res
+        const _data = formatData({data})
+        setData(_data)
+      } catch(e) {
+        console.log('fetch data error', e)
+      }
+    }
+    fetchData()
+  }, [])
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      {data.map((item) => {
+        const { id, username, age } = item
+        return (
+          <View style={styles.row} key={id}>
+            <Text>ID: {id}</Text>
+            <View style={{paddingHorizontal: 5}}/>
+            <Text>Name: {username}</Text>
+            <View style={{paddingHorizontal: 5}}/>
+            <Text>Age: {age}</Text>
+          </View>
+        )
+      })}
     </View>
   );
 }
@@ -17,4 +46,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  row: {
+    flexDirection: 'row'
+  }
 });
